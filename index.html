@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoLinux Desktop Environment</title>
+    <link rel="stylesheet" href="css/neolinux.css">
+</head>
+<body>
+    <!-- Cyberpunk Cursor -->
+    <div id="cyberpunk-cursor"></div>
+
+    <!-- Matrix Background Effect -->
+    <div class="matrix-bg" id="matrix-bg"></div>
+
+    <!-- Top Panel -->
+    <div class="panel">
+        <div class="panel-left">
+            <div class="activities-button" id="activities-btn">Activities</div>
+            <div class="panel-item">Applications</div>
+        </div>
+        <div class="panel-center">
+            <div id="panel-clock"></div>
+        </div>
+        <div class="panel-right">
+            <div class="system-tray">
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="tray-icon" id="settings-tray">⚙️</div>
+            <div class="tray-icon" id="power-btn">⏻</div>
+        </div>
+    </div>
+
+    <!-- Left Dock -->
+    <div class="dock">
+        <div class="dock-item" data-app="files" title="Files">📁</div>
+        <div class="dock-item" data-app="terminal" title="Terminal">💻</div>
+        <div class="dock-item" data-app="browser" title="Browser">🌐</div>
+        <div class="dock-item" data-app="editor" title="Text Editor">📝</div>
+        <div class="dock-item" data-app="homeassistant" title="Home Assistant">🏠</div>
+        <div class="dock-separator"></div>
+        <div class="dock-item" data-app="system" title="System Monitor">📊</div>
+        <div class="dock-item" data-app="settings" title="Settings">⚙️</div>
+        <div class="dock-item" data-app="software" title="Software Center">📦</div>
+    </div>
+
+    <!-- Desktop -->
+    <div id="desktop">
+    </div>
+
+    <!-- Activities Overlay -->
+    <div class="activities-overlay" id="activities-overlay">
+        <h2 style="color: white; margin-bottom: 30px;">Workspaces</h2>
+        <div class="workspace-grid">
+            <div class="workspace-preview">
+                <div class="workspace-number">Workspace 1</div>
+            </div>
+            <div class="workspace-preview">
+                <div class="workspace-number">Workspace 2</div>
+            </div>
+            <div class="workspace-preview">
+                <div class="workspace-number">Workspace 3</div>
+            </div>
+            <div class="workspace-preview">
+                <div class="workspace-number">Workspace 4</div>
+            </div>
+        </div>
+        <h3 style="color: white; margin: 40px 0 20px;">Applications</h3>
+        <div class="app-grid">
+            <div class="app-launcher" data-app="files">
+                <div class="app-launcher-icon">📁</div>
+                <div class="app-launcher-label">Files</div>
+            </div>
+            <div class="app-launcher" data-app="terminal">
+                <div class="app-launcher-icon">💻</div>
+                <div class="app-launcher-label">Terminal</div>
+            </div>
+            <div class="app-launcher" data-app="browser">
+                <div class="app-launcher-icon">🌐</div>
+                <div class="app-launcher-label">Firefox</div>
+            </div>
+            <div class="app-launcher" data-app="editor">
+                <div class="app-launcher-icon">📝</div>
+                <div class="app-launcher-label">Text Editor</div>
+            </div>
+            <div class="app-launcher" data-app="homeassistant">
+                <div class="app-launcher-icon">🏠</div>
+                <div class="app-launcher-label">Home Assistant</div>
+            </div>
+            <div class="app-launcher" data-app="system">
+                <div class="app-launcher-icon">📊</div>
+                <div class="app-launcher-label">System Monitor</div>
+            </div>
+            <div class="app-launcher" data-app="settings">
+                <div class="app-launcher-icon">⚙️</div>
+                <div class="app-launcher-label">Settings</div>
+            </div>
+            <div class="app-launcher" data-app="software">
+                <div class="app-launcher-icon">📦</div>
+                <div class="app-launcher-label">Software Center</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" id="ctx-open">Open</div>
+        <div class="context-menu-item" id="ctx-terminal">Open in Terminal</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-properties">Properties</div>
+        <div class="context-menu-item" id="ctx-refresh">Refresh</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-wallpaper">Change Wallpaper</div>
+    </div>
+
+    <!-- Load JavaScript Modules -->
+    <script src="js/apps.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="apps/homeassistant.js"></script>
+    <script src="apps/files.js"></script>
+    <script src="apps/browser.js"></script>
+    <script src="apps/editor.js"></script>
+    <script src="apps/system.js"></script>
+    <script src="apps/settings.js"></script>
+
+    <script>
+        // Initialize desktop environment
+        document.addEventListener('DOMContentLoaded', () => {
+            // Activities button
+            document.getElementById('activities-btn').addEventListener('click', () => {
+                const overlay = document.getElementById('activities-overlay');
+                overlay.classList.toggle('active');
+            });
+
+            // Close activities when clicking outside
+            document.getElementById('activities-overlay').addEventListener('click', (e) => {
+                if (e.target.id === 'activities-overlay') {
+                    e.target.classList.remove('active');
+                }
+            });
+
+            // Dock items
+            document.querySelectorAll('.dock-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const appName = item.getAttribute('data-app');
+                    if (appName) {
+                        createWindow(appName);
+                    }
+                });
+            });
+
+            // Desktop icons (if any exist)
+            document.querySelectorAll('.desktop-icon').forEach(icon => {
+                icon.addEventListener('dblclick', () => {
+                    const appName = icon.getAttribute('data-app');
+                    if (appName) {
+                        createWindow(appName);
+                    }
+                });
+
+                icon.addEventListener('click', () => {
+                    document.querySelectorAll('.desktop-icon').forEach(i => {
+                        i.classList.remove('selected');
+                    });
+                    icon.classList.add('selected');
+                });
+            });
+
+            // App launchers in activities
+            document.querySelectorAll('.app-launcher').forEach(launcher => {
+                launcher.addEventListener('click', () => {
+                    const appName = launcher.getAttribute('data-app');
+                    if (appName) {
+                        createWindow(appName);
+                        document.getElementById('activities-overlay').classList.remove('active');
+                    }
+                });
+            });
+
+            // Context menu
+            document.getElementById('desktop').addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                const contextMenu = document.getElementById('context-menu');
+                contextMenu.style.left = e.clientX + 'px';
+                contextMenu.style.top = e.clientY + 'px';
+                contextMenu.classList.add('active');
+            });
+
+            document.addEventListener('click', () => {
+                document.getElementById('context-menu').classList.remove('active');
+            });
+
+            // Power button
+            document.getElementById('power-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to shut down?')) {
+                    document.body.style.transition = 'opacity 1s';
+                    document.body.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #000; color: #00ff00; font-family: monospace; font-size: 20px;">System halted.</div>';
+                        document.body.style.opacity = '1';
+                    }, 1000);
+                }
+            });
+
+            // Initialize components
+            createMatrixEffect();
+            setInterval(updateClock, 1000);
+            updateClock();
+            initCursorHoverEffects();
+
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to NeoLinux', 'Your modular Linux desktop is ready');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
